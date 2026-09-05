@@ -207,86 +207,7 @@ lib/
 
 ## Screenshots
 
-Screenshots will be added later under:
-
-```text
-docs/screenshots/
-```
-
-Recommended filenames:
-
-```text
-docs/screenshots/
-├── student-home.png
-├── cv-analysis.png
-├── student-profile.png
-├── market-analysis.png
-├── chatbot.png
-├── company-home.png
-├── opportunities.png
-├── smart-ranking.png
-├── candidate-profile.png
-├── task-workspace.png
-├── notifications.png
-└── dark-mode.png
-```
-
-### Student Experience
-
-<!--
-<table>
-  <tr>
-    <td align="center"><strong>Student Home</strong></td>
-    <td align="center"><strong>CV Analysis</strong></td>
-    <td align="center"><strong>Market Analysis</strong></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/student-home.png" width="240"></td>
-    <td><img src="docs/screenshots/cv-analysis.png" width="240"></td>
-    <td><img src="docs/screenshots/market-analysis.png" width="240"></td>
-  </tr>
-</table>
--->
-
-_Screenshots coming soon._
-
-### Company Experience
-
-<!--
-<table>
-  <tr>
-    <td align="center"><strong>Company Home</strong></td>
-    <td align="center"><strong>Opportunities</strong></td>
-    <td align="center"><strong>Smart Ranking</strong></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/company-home.png" width="240"></td>
-    <td><img src="docs/screenshots/opportunities.png" width="240"></td>
-    <td><img src="docs/screenshots/smart-ranking.png" width="240"></td>
-  </tr>
-</table>
--->
-
-_Screenshots coming soon._
-
-### Workflow & Communication
-
-<!--
-<table>
-  <tr>
-    <td align="center"><strong>Task Workspace</strong></td>
-    <td align="center"><strong>Notifications</strong></td>
-    <td align="center"><strong>Chatbot</strong></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/task-workspace.png" width="240"></td>
-    <td><img src="docs/screenshots/notifications.png" width="240"></td>
-    <td><img src="docs/screenshots/chatbot.png" width="240"></td>
-  </tr>
-</table>
--->
-
-_Screenshots coming soon._
+Project screenshots will be added soon to showcase the main Student and Company workflows, including CV analysis, market insights, opportunities, smart candidate ranking, task management, notifications, and the AI chatbot.
 
 ---
 
@@ -407,18 +328,6 @@ Jisr Platform was developed collaboratively as a graduation project.
 This repository focuses on the **Flutter mobile application**.
 
 Some backend, web, supervisor, admin, and AI services belong to other parts of the complete Jisr Platform ecosystem.
-
----
-
-## Security Notes
-
-Before publishing or deploying the project:
-- Do not commit `.env` files
-- Do not commit private API keys
-- Do not commit access tokens
-- Do not commit passwords
-- Do not commit private Firebase service-account files
-- Keep sensitive configuration outside source control
 
 ---
 
