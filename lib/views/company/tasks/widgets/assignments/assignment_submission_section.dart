@@ -1,0 +1,768 @@
+import 'package:flutter/material.dart';
+import 'package:jisr_platform/core/colors/app_colors.dart';
+import 'package:jisr_platform/models/company/tasks/company_task_assignment_submission_model.dart';
+
+import 'package:get/get.dart';
+class AssignmentSubmissionSection extends StatelessWidget {
+  final CompanyTaskAssignmentSubmissionModel? submission;
+  final bool isLoading;
+  final String errorMessage;
+  final String Function(String) statusLabel;
+  final String Function(String) submissionTypeLabel;
+  final String Function(DateTime?) formatDateTime;
+  final ValueChanged<String> onOpenLink;
+  final VoidCallback onRetry;
+
+  const AssignmentSubmissionSection({
+    super.key,
+    required this.submission,
+    required this.isLoading,
+    required this.errorMessage,
+    required this.statusLabel,
+    required this.submissionTypeLabel,
+    required this.formatDateTime,
+    required this.onOpenLink,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading && submission == null) {
+      return const _SubmissionLoadingState();
+    }
+
+    if (errorMessage.isNotEmpty && submission == null) {
+      if (_isMissingSubmissionMessage(errorMessage)) {
+        return const _EmptySubmissionState();
+      }
+
+      return _SubmissionErrorState(
+        message: _toFriendlyErrorMessage(errorMessage),
+        onRetry: onRetry,
+      );
+    }
+
+    if (submission == null) {
+      return const _EmptySubmissionState();
+    }
+
+    final finalSubmission = submission!.submission;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+             Expanded(
+              child: Text(
+                'التسليم النهائي',
+                style: TextStyle(
+                  color: Get.theme.colorScheme.onSurface,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+            _StatusChip(
+              label: statusLabel(submission!.status),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        _SubmissionSummaryCard(
+          submission: submission!,
+          submissionTypeLabel: submissionTypeLabel,
+          formatDateTime: formatDateTime,
+        ),
+        const SizedBox(height: 18),
+
+         Text(
+          'الروابط والملفات المرفقة',
+          style: TextStyle(
+            color: Get.theme.colorScheme.onSurface,
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        if (finalSubmission.hasGithubUrl)
+          _SubmissionLinkCard(
+            title: 'مستودع GitHub',
+            subtitle: 'اضغط لنسخ رابط الكود المرفق',
+            icon: Icons.code_rounded,
+            onTap: () => onOpenLink(
+              finalSubmission.githubUrl!,
+            ),
+          ),
+
+        if (finalSubmission.hasGithubUrl &&
+            (finalSubmission.hasDemoUrl || finalSubmission.hasZipFile))
+          const SizedBox(height: 10),
+
+        if (finalSubmission.hasDemoUrl)
+          _SubmissionLinkCard(
+            title: 'العرض التجريبي',
+            subtitle: 'اضغط لنسخ رابط العرض أو النسخة التجريبية',
+            icon: Icons.play_circle_outline_rounded,
+            onTap: () => onOpenLink(
+              finalSubmission.demoUrl!,
+            ),
+          ),
+
+        if (finalSubmission.hasDemoUrl && finalSubmission.hasZipFile)
+          const SizedBox(height: 10),
+
+        if (finalSubmission.hasZipFile)
+          _SubmissionLinkCard(
+            title: 'ملف التسليم ZIP',
+            subtitle: 'اضغط لنسخ رابط ملف التسليم النهائي',
+            icon: Icons.folder_zip_outlined,
+            onTap: () => onOpenLink(
+              finalSubmission.zipFile!.url,
+            ),
+          ),
+
+        if (!finalSubmission.hasGithubUrl &&
+            !finalSubmission.hasDemoUrl &&
+            !finalSubmission.hasZipFile)
+          const _NoLinksState(),
+
+        const SizedBox(height: 18),
+
+         Text(
+          'ملاحظات الطالب',
+          style: TextStyle(
+            color: Get.theme.colorScheme.onSurface,
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        _StudentNotesCard(
+          notes: finalSubmission.notes,
+        ),
+        const SizedBox(height: 18),
+
+         Text(
+          'إحصاءات المهمة',
+          style: TextStyle(
+            color: Get.theme.colorScheme.onSurface,
+            fontSize: 16,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 10),
+
+        Row(
+          children: [
+            Expanded(
+              child: _StatCard(
+                label: 'الطلاب المقبولون',
+                value: submission!.stats.acceptedStudentsCount.toString(),
+                icon: Icons.groups_2_outlined,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _StatCard(
+                label: 'التسليمات المستلمة',
+                value: submission!.stats.submissionsCount.toString(),
+                icon: Icons.assignment_turned_in_outlined,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  static bool _isMissingSubmissionMessage(String message) {
+    final normalizedMessage = message.toLowerCase();
+
+    return normalizedMessage.contains('no submission') ||
+        normalizedMessage.contains('no final submission') ||
+        normalizedMessage.contains('final submission') ||
+        normalizedMessage.contains('not found') ||
+        normalizedMessage.contains('لا يوجد') ||
+        normalizedMessage.contains('لا توجد') ||
+        normalizedMessage.contains('غير موجود') ||
+        normalizedMessage.contains('غير موجودة') ||
+        normalizedMessage.contains('لم يتم العثور');
+  }
+
+  static String _toFriendlyErrorMessage(String message) {
+    final normalizedMessage = message.toLowerCase().trim();
+
+    if (normalizedMessage.isEmpty) {
+      return 'حدث خطأ غير متوقع أثناء تحميل بيانات التسليم. يرجى المحاولة مرة أخرى.';
+    }
+
+    if (normalizedMessage.contains('socket') ||
+        normalizedMessage.contains('connection') ||
+        normalizedMessage.contains('network') ||
+        normalizedMessage.contains('failed host lookup')) {
+      return 'تعذر الاتصال بالخادم. تأكد من اتصال الإنترنت ثم حاول مرة أخرى.';
+    }
+
+    if (normalizedMessage.contains('timeout') ||
+        normalizedMessage.contains('انتهت مهلة')) {
+      return 'استغرق الاتصال وقتاً أطول من المتوقع. حاول مرة أخرى بعد لحظات.';
+    }
+
+    if (normalizedMessage.contains('unauthenticated') ||
+        normalizedMessage.contains('unauthorized') ||
+        normalizedMessage.contains('401')) {
+      return 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.';
+    }
+
+    if (normalizedMessage.contains('forbidden') ||
+        normalizedMessage.contains('403')) {
+      return 'لا تملك صلاحية الوصول إلى بيانات هذا التسليم.';
+    }
+
+    final arabicPart = message.split('|').first.trim();
+    final hasArabicLetters = RegExp(r'[\u0600-\u06FF]').hasMatch(arabicPart);
+
+    if (hasArabicLetters && arabicPart.length <= 120) {
+      return arabicPart;
+    }
+
+    return 'تعذر تحميل بيانات التسليم النهائي حالياً. يرجى المحاولة مرة أخرى.';
+  }
+}
+
+class _SubmissionSummaryCard extends StatelessWidget {
+  final CompanyTaskAssignmentSubmissionModel submission;
+  final String Function(String) submissionTypeLabel;
+  final String Function(DateTime?) formatDateTime;
+
+  const _SubmissionSummaryCard({
+    required this.submission,
+    required this.submissionTypeLabel,
+    required this.formatDateTime,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: _cardDecoration(),
+      child: Column(
+        children: [
+          _SummaryRow(
+            icon: Icons.person_outline_rounded,
+            label: 'الطالب',
+            value: submission.student.name,
+          ),
+          const Divider(height: 24),
+          _SummaryRow(
+            icon: Icons.assignment_outlined,
+            label: 'نوع التسليم',
+            value: submissionTypeLabel(
+              submission.task.submissionType,
+            ),
+          ),
+          const Divider(height: 24),
+          _SummaryRow(
+            icon: Icons.schedule_outlined,
+            label: 'تاريخ الإرسال',
+            value: formatDateTime(submission.submittedAt),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SummaryRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _SummaryRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: AppColors.primaryBlue,
+          size: 20,
+        ),
+        const SizedBox(width: 10),
+        Text(
+          label,
+          style:  TextStyle(
+            color: Get.theme.colorScheme.onSurfaceVariant,
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const Spacer(),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.left,
+            style:  TextStyle(
+              color: Get.theme.colorScheme.onSurface,
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SubmissionLinkCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _SubmissionLinkCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: _cardDecoration(radius: 18),
+          child: Row(
+            children: [
+              Container(
+                height: 44,
+                width: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlue.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(
+                  icon,
+                  color: AppColors.primaryBlue,
+                  size: 23,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style:  TextStyle(
+                        color: Get.theme.colorScheme.onSurface,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style:  TextStyle(
+                        color: Get.theme.colorScheme.onSurfaceVariant,
+                        fontSize: 12,
+                        height: 1.4,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                height: 34,
+                width: 34,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlue.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.copy_rounded,
+                  color: AppColors.primaryBlue,
+                  size: 18,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StudentNotesCard extends StatelessWidget {
+  final String notes;
+
+  const _StudentNotesCard({
+    required this.notes,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasNotes = notes.trim().isNotEmpty;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: _cardDecoration(),
+      child: Text(
+        hasNotes ? notes : 'لم يضف الطالب ملاحظات مع التسليم النهائي.',
+        style: TextStyle(
+          color: hasNotes ? Get.theme.colorScheme.onSurface : Get.theme.colorScheme.onSurfaceVariant,
+          fontSize: 13,
+          height: 1.6,
+          fontWeight: hasNotes ? FontWeight.w600 : FontWeight.w500,
+        ),
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _StatCard({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: _cardDecoration(radius: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            icon,
+            color: AppColors.primaryBlue,
+            size: 21,
+          ),
+          const SizedBox(height: 14),
+          Text(
+            value,
+            style:  TextStyle(
+              color: Get.theme.colorScheme.onSurface,
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style:  TextStyle(
+              color: Get.theme.colorScheme.onSurfaceVariant,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  final String label;
+
+  const _StatusChip({
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 7,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.primaryBlue.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: AppColors.primaryBlue,
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+class _NoLinksState extends StatelessWidget {
+  const _NoLinksState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: _cardDecoration(radius: 18),
+      child:  Row(
+        children: [
+          Icon(
+            Icons.info_outline_rounded,
+            color: Get.theme.colorScheme.onSurfaceVariant,
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'لم يرفق الطالب روابطاً أو ملفات إضافية.',
+              style: TextStyle(
+                color: Get.theme.colorScheme.onSurfaceVariant,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptySubmissionState extends StatelessWidget {
+  const _EmptySubmissionState();
+
+  @override
+  Widget build(BuildContext context) {
+    return const _SubmissionStateCard(
+      icon: Icons.assignment_late_outlined,
+      title: 'لا يوجد تسليم نهائي حتى الآن',
+      message:
+          'عند إرسال الطالب للتسليم النهائي ستظهر هنا الروابط والملفات والملاحظات الخاصة به.',
+    );
+  }
+}
+
+class _SubmissionStateCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String message;
+
+  const _SubmissionStateCard({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 18,
+        vertical: 24,
+      ),
+      decoration: _cardDecoration(radius: 22),
+      child: Column(
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlue.withOpacity(0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.primaryBlue,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style:  TextStyle(
+              color: Get.theme.colorScheme.onSurface,
+              fontSize: 15,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style:  TextStyle(
+              color: Get.theme.colorScheme.onSurfaceVariant,
+              fontSize: 12.5,
+              height: 1.6,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SubmissionLoadingState extends StatelessWidget {
+  const _SubmissionLoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 18,
+        vertical: 36,
+      ),
+      decoration: _cardDecoration(radius: 22),
+      child:  Column(
+        children: [
+          SizedBox(
+            width: 34,
+            height: 34,
+            child: CircularProgressIndicator(
+              color: AppColors.primaryBlue,
+              strokeWidth: 3,
+            ),
+          ),
+          SizedBox(height: 14),
+          Text(
+            'جاري تحميل بيانات التسليم النهائي...',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Get.theme.colorScheme.onSurfaceVariant,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SubmissionErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _SubmissionErrorState({
+    required this.message,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: _cardDecoration(radius: 22),
+      child: Column(
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlue.withOpacity(0.08),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.cloud_off_rounded,
+              color: AppColors.primaryBlue,
+              size: 28,
+            ),
+          ),
+          const SizedBox(height: 14),
+           Text(
+            'تعذر تحميل بيانات التسليم',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Get.theme.colorScheme.onSurface,
+              fontSize: 15,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style:  TextStyle(
+              color: Get.theme.colorScheme.onSurfaceVariant,
+              fontSize: 12.5,
+              height: 1.6,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 18),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(
+                Icons.refresh_rounded,
+                size: 18,
+              ),
+              label: const Text(
+                'إعادة تحميل البيانات',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryBlue,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 13,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+BoxDecoration _cardDecoration({
+  double radius = 20,
+}) {
+  return BoxDecoration(
+    color: Get.theme.colorScheme.surface,
+    borderRadius: BorderRadius.circular(radius),
+    border: Border.all(
+      color: AppColors.primaryBlue.withOpacity(0.08),
+    ),
+    boxShadow: [
+      BoxShadow(
+        color: AppColors.primaryBlue.withOpacity(0.05),
+        blurRadius: 16,
+        offset: const Offset(0, 8),
+      ),
+    ],
+  );
+}

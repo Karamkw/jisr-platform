@@ -1,0 +1,144 @@
+import 'package:flutter/material.dart';
+import 'package:jisr_platform/core/colors/app_colors.dart';
+
+import 'package:get/get.dart';
+class EmptyTasksState extends StatelessWidget {
+  final VoidCallback onCreatePressed;
+  final String title;
+  final String message;
+  const EmptyTasksState({
+    super.key,
+    required this.onCreatePressed,
+    this.title = 'لا توجد مهام بعد',
+    this.message = 'ابدأ بإنشاء أول مهمة ليستطيع الطلاب المناسبون التقديم عليها.',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Get.theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.primaryBlue.withOpacity(0.06)),
+      ),
+      child: Column(
+        children: [
+          Container(
+            height: 56,
+            width: 56,
+            decoration: BoxDecoration(
+              color: AppColors.primaryBlue.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: const Icon(
+              Icons.assignment_add,
+              color: AppColors.primaryBlue,
+              size: 30,
+            ),
+          ),
+          const SizedBox(height: 14),
+           Text(
+            title,
+            style: TextStyle(
+              color: Get.theme.colorScheme.onSurface,
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+           Text(
+             message,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Get.theme.colorScheme.onSurfaceVariant,
+              fontSize: 13.5,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 46,
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: onCreatePressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryBlue,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: const Text(
+                'إنشاء مهمة جديدة',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TasksErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const TasksErrorState({
+    super.key,
+    required this.message,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(22),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.error_outline_rounded,
+              color: AppColors.primaryBlue,
+              size: 40,
+            ),
+            const SizedBox(height: 12),
+             Text(
+              'تعذر تحميل المهام',
+              style: TextStyle(
+                color: Get.theme.colorScheme.onSurface,
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style:  TextStyle(
+                color: Get.theme.colorScheme.onSurfaceVariant,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: onRetry,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryBlue,
+              ),
+              child: const Text(
+                'إعادة المحاولة',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

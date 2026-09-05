@@ -1,0 +1,350 @@
+class ApiLinks {
+  //karam link
+   static const String baseUrl = 'http://192.168.0.138:8000/api';
+    
+  //baraa link0
+  //static const String baseUrl = 'http://192.168.50.47:8001/api';
+
+  ////////authentication
+  static const String register = '$baseUrl/register';
+  static const String login = '$baseUrl/login';
+  static const String verifyLoginOtp = '$baseUrl/login/verify-otp';
+  static const String logout = '$baseUrl/logout';
+  static const String logoutAll = '$baseUrl/logout-all';
+  // notifications
+  static const String notifications = '$baseUrl/notifications';
+
+  static String markNotificationAsRead(int notificationId) =>
+      '$baseUrl/notifications/$notificationId/read';
+
+  static const String markAllNotificationsAsRead =
+      '$baseUrl/notifications/read-all';
+
+  static const String unreadNotificationsCount =
+      '$baseUrl/notifications/unread-count';
+
+  static const String notificationDeviceTokens =
+      '$baseUrl/notifications/device-tokens';
+
+  /////////////////reset password
+  static const String forgotPassword = '$baseUrl/password/forgot';
+  static const String verifyResetOtp = '$baseUrl/password/reset/verify-otp';
+  static const String resendResetOtp = '$baseUrl/otp/resend';
+  static const String resetPassword = '$baseUrl/password/reset';
+
+  ///////student
+  static const String uploadCv = '$baseUrl/cvs/upload';
+  static String analyzeCv(int cvId) => '$baseUrl/cvs/$cvId/analyze';
+  static const String studentCvs = '$baseUrl/student/cvs';
+  static String studentCvAnalysis(int cvId) =>
+      '$baseUrl/student/cvs/$cvId/analysis';
+  static const String createAssessment = '$baseUrl/assessments';
+
+  static String nextAssessmentQuestion({
+    required int assessmentSessionId,
+    required int skillId,
+  }) =>
+      '$baseUrl/assessments/$assessmentSessionId/skills/$skillId/next-question';
+
+  static String submitAssessmentAnswer({
+    required int assessmentSessionId,
+    required int attemptId,
+  }) => '$baseUrl/assessments/$assessmentSessionId/attempts/$attemptId/answer';
+  static String completeAssessment({required int assessmentSessionId}) =>
+      '$baseUrl/assessments/$assessmentSessionId/complete';
+  static const String studentProfile = '$baseUrl/student/profile';
+  static const String editStudentProfile = '$baseUrl/student/profile/edit';
+
+  static String assessmentSummary({required int assessmentSessionId}) =>
+      '$baseUrl/assessments/$assessmentSessionId/summary';
+
+  static String assessmentSkillGaps({required int assessmentSessionId}) =>
+      '$baseUrl/assessments/$assessmentSessionId/skill-gaps';
+
+  static String assessmentLearningPath({required int assessmentSessionId}) =>
+      '$baseUrl/assessments/$assessmentSessionId/learning-path';
+  static String aiLearningPlan({required int assessmentSessionId}) =>
+      '$baseUrl/assessments/$assessmentSessionId/ai-learning-plan';
+
+  static String latestAiLearningPlan({required int assessmentSessionId}) =>
+      '$baseUrl/assessments/$assessmentSessionId/ai-learning-plan/latest';
+  //بروتفوليم
+  static const String portfolioProjects = '$baseUrl/student/portfolio-projects';
+
+  static String portfolioProjectDetails(int projectId) =>
+      '$baseUrl/student/portfolio-projects/$projectId';
+
+  static String updatePortfolioProject(int projectId) =>
+      '$baseUrl/student/portfolio-projects/$projectId';
+
+  static String deletePortfolioProject(int projectId) =>
+      '$baseUrl/student/portfolio-projects/$projectId';
+  // tasks
+  static const String exploreTasks = '$baseUrl/student/tasks/explore';
+
+  static const String recommendedTasks = '$baseUrl/student/tasks/recommended';
+
+  static String taskDetails(int taskId) => '$baseUrl/student/tasks/$taskId';
+  static String applyToTask(int taskId) =>
+      '$baseUrl/student/tasks/$taskId/apply';
+
+  // supervisor-created projects for students
+  static const String studentSupervisorProjects =
+      '$baseUrl/student/project-templates';
+
+  static String studentSupervisorProjectDetails(int projectTemplateId) =>
+      '$baseUrl/student/project-templates/$projectTemplateId';
+
+  static String applyToStudentSupervisorProject(int projectTemplateId) =>
+      '$baseUrl/student/project-templates/$projectTemplateId/apply';
+
+  static const String studentSupervisorProjectApplications =
+      '$baseUrl/student/project-templates/applications/all';
+  // opportunities
+  static const String studentRecommendedOpportunities =
+      '$baseUrl/student/opportunities/recommended';
+
+  static const String studentExploreOpportunities =
+      '$baseUrl/student/opportunities/explore';
+
+  static String studentOpportunityDetails(int opportunityId) =>
+      '$baseUrl/student/opportunities/$opportunityId';
+
+  static String applyToStudentOpportunity(int opportunityId) =>
+      '$baseUrl/student/opportunities/$opportunityId/apply';
+
+  static const String studentOpportunityApplications =
+      '$baseUrl/student/applications';
+
+  static String studentOpportunityApplicationDetails(int applicationId) =>
+      '$baseUrl/student/applications/$applicationId';
+
+  static String withdrawStudentOpportunityApplication(int applicationId) =>
+      '$baseUrl/student/applications/$applicationId/withdraw';
+
+  // student interviews
+  static const String studentInterviews = '$baseUrl/student/interviews';
+  //مهامي المسندة
+  // assigned tasks
+  static const String projectAssignmentTasks =
+      '$baseUrl/student/project-assignment-tasks';
+
+  static String startAssignedTask(int taskId) =>
+      '$baseUrl/supervisor/assignment-tasks/$taskId/start';
+
+  static String submitAssignedTask(int taskId) =>
+      '$baseUrl/supervisor/assignment-tasks/$taskId/submit';
+
+  // student project evaluation & appeals
+  static String studentProjectAssignmentEvaluation(int projectAssignmentId) =>
+      '$baseUrl/student/project-assignments/$projectAssignmentId/evaluation';
+
+  static String studentProjectEvaluationAppeals(int evaluationId) =>
+      '$baseUrl/student/project-evaluations/$evaluationId/appeals';
+
+  static const String studentEvaluationAppeals =
+      '$baseUrl/student/evaluation-appeals';
+
+  // student mentor application and approved mentor discovery
+  static const String myMentorApplication = '$baseUrl/mentor/application/me';
+  static const String mentorApplication = '$baseUrl/mentor/application';
+  static const String studentMentors = '$baseUrl/student/mentors';
+  static String studentMentorDetails(int mentorProfileId) =>
+      '$baseUrl/student/mentors/$mentorProfileId';
+  // تاسكاتي
+  // my task applications
+  static const String allMyTasks = '$baseUrl/student/tasks/allMyTask';
+  static const String appliedTasks = '$baseUrl/student/tasks/applied';
+  static const String acceptedTasks = '$baseUrl/student/tasks/accepted';
+  static const String rejectedTasks = '$baseUrl/student/tasks/rejected';
+
+  // conversations
+  static const String taskConversations =
+      '$baseUrl/conversations/task-conversations';
+
+  static const String allConversations = '$baseUrl/conversations/all';
+
+  static const String closedConversations = '$baseUrl/conversations/closed';
+
+  static String conversationMessages(int conversationId) =>
+      '$baseUrl/conversations/messages/$conversationId';
+
+  static String updateConversationMessage(int messageId) =>
+      '$baseUrl/conversations/messages/update/$messageId';
+
+  static String markConversationAsRead(int conversationId) =>
+      '$baseUrl/conversations/$conversationId/read';
+
+  // chatbot
+  static const String chatbotConversations =
+      '$baseUrl/student/chatbot/conversations';
+
+  static String chatbotConversation(int conversationId) =>
+      '$baseUrl/student/chatbot/conversations/$conversationId';
+
+  static String chatbotMessages(int conversationId) =>
+      '$baseUrl/student/chatbot/conversations/$conversationId/messages';
+
+  // task assignment progress & final submission
+  static String taskAssignmentProgress(int assignmentId) =>
+      '$baseUrl/student/task-assignments/$assignmentId/progress';
+
+  static String taskAssignmentSubmission(int assignmentId) =>
+      '$baseUrl/student/task-assignments/$assignmentId/submission';
+
+  // community posts
+  static const String communityPosts = '$baseUrl/community/posts';
+
+  static String communityPostDetails(int postId) =>
+      '$baseUrl/community/posts/$postId';
+
+  static String communityPostLike(int postId) =>
+      '$baseUrl/community/posts/$postId/like';
+
+  static String communityPostComments(int postId) =>
+      '$baseUrl/community/posts/$postId/comments';
+
+  static String communityCommentDetails(int commentId) =>
+      '$baseUrl/community/comments/$commentId';
+
+  static String communityCommentReplies(int commentId) =>
+      '$baseUrl/community/comments/$commentId/replies';
+
+  // market analysis
+  static const String marketCareerPaths =
+      '$baseUrl/market-analysis/career-paths';
+
+  static String marketSkillDemand(int careerPathId) =>
+      '$baseUrl/market-analysis/career-paths/$careerPathId/skill-demand';
+
+  static String marketTrends(int careerPathId) =>
+      '$baseUrl/market-analysis/career-paths/$careerPathId/trends';
+
+  static String marketSkillEvidence({
+    required int careerPathId,
+    required int skillId,
+  }) =>
+      '$baseUrl/market-analysis/career-paths/$careerPathId/skills/$skillId/evidence';
+
+  // student points
+  static const String myPoints = '$baseUrl/me/points';
+  static const String myPointsHistory = '$baseUrl/me/points/history';
+
+  //////company///////////////////////////////////////
+  ////////////////////////////////////////////////////
+  static const String companyHome = '$baseUrl/company/home';
+  static const String skills = '$baseUrl/skills';
+  static const String companyProfile = '$baseUrl/company/profile';
+  static const String editCompanyProfile = '$baseUrl/company/profile/edit';
+
+  static const String companyTasks = '$baseUrl/company/tasks';
+  static const String companyTasksIndex = '$baseUrl/company/tasks/index';
+  static String publishCompanyTask(int taskId) =>
+      '$baseUrl/company/tasks/$taskId/publish';
+
+  // company task details
+  static String companyTaskDetails(int taskId) =>
+      '$baseUrl/company/tasks/$taskId';
+
+  static String updateCompanyTask(int taskId) =>
+      '$baseUrl/company/tasks/$taskId';
+  static String cancelCompanyTask(int taskId) =>
+      '$baseUrl/company/tasks/$taskId/cancel';
+  //  للمتقدمين
+  static String companyTaskApplications(int taskId) =>
+      '$baseUrl/company/tasks/$taskId/applications';
+
+  static String companyTaskApplicantDetails(int applicationId) =>
+      '$baseUrl/company/tasks/applications/student/details/$applicationId';
+
+  static String acceptTaskApplication(int applicationId) =>
+      '$baseUrl/company/tasks/applications/accept/$applicationId';
+
+  static String rejectTaskApplication(int applicationId) =>
+      '$baseUrl/company/tasks/applications/reject/$applicationId';
+
+  static const String companyTaskAssignments =
+      '$baseUrl/company/task-assignments';
+  static String companyTaskAssignmentDetails(int assignmentId) =>
+      '$baseUrl/company/task-assignments/$assignmentId';
+  static String companyTaskAssignmentProgress(int assignmentId) =>
+      '$baseUrl/company/task-assignments/$assignmentId/progress';
+
+  static String companyTaskAssignmentSubmission(int assignmentId) =>
+      '$baseUrl/company/task-assignments/$assignmentId/submission';
+
+  static String companyTaskSubmissionReview(int submissionId) =>
+      '$baseUrl/company/tasks/review/$submissionId';
+
+  // company opportunities
+  static const String companyOpportunities = '$baseUrl/company/opportunities';
+
+  static String companyOpportunityDetails(int opportunityId) =>
+      '$baseUrl/company/opportunities/$opportunityId';
+
+  static String publishCompanyOpportunity(int opportunityId) =>
+      '$baseUrl/company/opportunities/$opportunityId/publish';
+
+  static String closeCompanyOpportunity(int opportunityId) =>
+      '$baseUrl/company/opportunities/$opportunityId/close';
+
+  static String cancelCompanyOpportunity(int opportunityId) =>
+      '$baseUrl/company/opportunities/$opportunityId/cancel';
+
+  static String companyOpportunityCandidates(int opportunityId) =>
+      '$baseUrl/company/opportunities/$opportunityId/candidates';
+
+  static String companyOpportunityTopCandidates(int opportunityId) =>
+      '$baseUrl/opportunities/$opportunityId/top-candidates';
+
+  static String companyOpportunityCandidateDetails(
+    int opportunityId,
+    int applicationId,
+  ) =>
+      '$baseUrl/company/opportunities/$opportunityId/candidates/$applicationId';
+
+  static String scheduleCompanyOpportunityInterview(
+    int opportunityId,
+    int applicationId,
+  ) =>
+      '$baseUrl/company/opportunities/$opportunityId/interviews/$applicationId';
+
+  static String rescheduleCompanyOpportunityInterview(
+    int opportunityId,
+    int interviewId,
+  ) =>
+      '$baseUrl/company/opportunities/$opportunityId/interviews/$interviewId/reschedule';
+
+  static String cancelCompanyOpportunityInterview(
+    int opportunityId,
+    int interviewId,
+  ) =>
+      '$baseUrl/company/opportunities/$opportunityId/interviews/$interviewId/cancel';
+
+  static String completeCompanyOpportunityInterview(
+    int opportunityId,
+    int interviewId,
+  ) =>
+      '$baseUrl/company/opportunities/$opportunityId/interviews/$interviewId/complete';
+
+  static const String opportunityConversations =
+      '$baseUrl/conversations/opportunity-conversations';
+
+  static const String companyMentorNominations =
+      '$baseUrl/company/mentor-nominations';
+
+  //complaints
+  static const String complaints = '$baseUrl/complaints';
+
+  static const String myComplaints = '$baseUrl/complaints/mine';
+//search students
+static const String companyStudents =
+    '$baseUrl/company/students';
+
+static String companyStudentDetails(
+  int studentId,
+) =>
+    '$companyStudents/$studentId';
+
+  
+}

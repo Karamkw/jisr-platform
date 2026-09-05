@@ -1,0 +1,101 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:jisr_platform/controllers/company/tasks/company_tasks_controller.dart';
+import 'package:jisr_platform/core/colors/app_colors.dart';
+import 'package:jisr_platform/views/company/tasks/widgets/task_status_filter_bar.dart';
+
+import 'widgets/company_task_card.dart';
+import 'widgets/task_execution_monitoring_card.dart';
+import 'widgets/tasks_header.dart';
+import 'widgets/tasks_states_widgets.dart';
+
+class CompanyTasksView extends GetView<CompanyTasksController> {
+  const CompanyTasksView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Get.theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(
+                color: AppColors.primaryBlue,
+              ),
+            );
+          }
+
+          if (controller.errorMessage.value.isNotEmpty) {
+            return TasksErrorState(
+              message: controller.errorMessage.value,
+              onRetry: controller.fetchTasks,
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: controller.fetchTasks,
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+              children: [
+                TasksHeader(
+                  onCreatePressed: controller.goToCreateTask,
+                ),
+                const SizedBox(height: 18),
+
+                TaskExecutionMonitoringCard(
+                  onTap: controller.goToTaskAssignments,
+                ),
+
+              const SizedBox(height: 22),
+
+TaskStatusFilterBar(
+  selectedFilter: controller.selectedStatusFilter.value,
+  onChanged: controller.selectStatusFilter,
+),
+
+const SizedBox(height: 24),
+
+Text(
+  controller.tasksSectionTitle,
+  style:  TextStyle(
+    color: Get.theme.colorScheme.onSurface,
+    fontSize: 17,
+    fontWeight: FontWeight.w900,
+  ),
+),
+
+const SizedBox(height: 12),
+                if (controller.tasks.isEmpty)
+                  EmptyTasksState(
+  onCreatePressed: controller.goToCreateTask,
+  title: controller.isShowingAllTasks
+      ? 'لا توجد مهام بعد'
+      : 'لا توجد مهام ضمن هذا الفلتر',
+  message: controller.isShowingAllTasks
+      ? 'ابدأ بإنشاء أول مهمة ليستطيع الطلاب المناسبون التقديم عليها.'
+      : 'جرّب اختيار حالة أخرى أو أنشئ مهمة جديدة.',
+)
+                else
+                  ...controller.tasks.map(
+                    (task) => Padding(
+                      padding: const EdgeInsets.only(bottom: 14),
+                      child: CompanyTaskCard(
+                        task: task,
+                        statusLabel: controller.statusLabel(task.status),
+                        difficultyLabel:
+                            controller.difficultyLabel(task.difficultyLevel),
+                        onTap: () => controller.goToTaskDetails(task.id),
+                        onPublishPressed: null,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
